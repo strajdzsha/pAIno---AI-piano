@@ -96,7 +96,7 @@ if __name__ == '__main__':
     #block_size = 128
     config = get_config()
 
-    full_path_to_training_text_file = "Dataset.txt" 
+    full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset.txt" 
     dataset_arr = np.loadtxt(full_path_to_training_text_file)
     #text = open(full_path_to_training_text_file, 'r').read() 
     train_dataset = CharDataset(config.data, dataset_arr) 
