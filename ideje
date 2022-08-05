@@ -17,11 +17,15 @@
 
 ### Plan rada za 5.8.
 # Strahinja
-- probati druge dataset-ove
--  skratiti podatke: nepotrebno pojavljivanje 88 i 89
-- proveriti da li je dobra konverzija iz numpy niza u midi (povisenje pitch-a za 40)
+- probati druge dataset-ove T
+- skratiti podatke : nepotrebno pojavljivanje 88 i 89
+- proveriti da li je dobra konverzija iz numpy niza u midi (povisenje pitch-a za 40) T
 - razmotriti razdvajanje pesama u samom dataset-u
 - razmisliti o pametnijem kodiranju nota (velocity, akordi...)?
 
+- https://github.com/mcleavey/musical-neural-net ?
+- MIDI konverzija u pitch radi samo bez akorda ... sta sad sa akordima?
+
 # Teodora
--
+- proveriti kako GPT sempluje nase podatke (batch, sampler, block_size...)
+- 

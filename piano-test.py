@@ -27,7 +27,7 @@ class CharDataset(Dataset):
     @staticmethod
     def get_default_config():
         C = CN()
-        C.block_size = 128
+        C.block_size = 32
         return C
 
     def __init__(self, config, data):
@@ -52,6 +52,7 @@ class CharDataset(Dataset):
         return len(self.data) - self.config.block_size
 
     def __getitem__(self, idx):
+        print(" " + str(idx) + " ")
         # grab a chunk of (block_size + 1) characters from the data
         chunk = self.data[idx:idx + self.config.block_size + 1]
         # encode every character to an integer
@@ -97,9 +98,8 @@ if __name__ == '__main__':
     #block_size = 128
     config = get_config()
 
-    full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset.txt" 
-    dataset_arr = np.loadtxt(full_path_to_training_text_file)
-    #text = open(full_path_to_training_text_file, 'r').read() 
+    full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset_mini.npy" 
+    dataset_arr = np.load(full_path_to_training_text_file)
     train_dataset = CharDataset(config.data, dataset_arr) 
 
 
@@ -114,24 +114,26 @@ if __name__ == '__main__':
         if trainer.iter_num % 10 == 0:
             print(f"iter_dt {trainer.iter_dt * 1000:.2f}ms; iter {trainer.iter_num}: train loss {trainer.loss.item():.5f}")
         
-        if trainer.iter_num % 5000 == 0:
+        n_train_eval = 2000
+        if trainer.iter_num % n_train_eval == 0 :
             # evaluate both the train and test score
             model.eval()
             with torch.no_grad():
                 # sample from the model...
-                rand_int = np.random.randint(0, 10)
-                contexts = [[20, 89, 89, 89], [30, 20, 40, 50], [20], [70, 89], [30, 89, 89, 89, 89, 89, 89, 89, 89, 88, 88, 88, 88, 88, 88, 88, 88, 88,
-        88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88,
-        88, 88, 88, 88, 88, 88, 88, 88, 88, 42], [54, 89, 89, 89, 89, 89, 60, 89, 89, 89, 89], [40], [50], [10], [88], [13, 13, 13, 13]]
-                context = contexts[rand_int]
+
+                context = [48, 129, 129, 129] # pitch representation of prompt
+                context = [train_dataset.stoi[x] for x in context] # going form pitch representation to something model would train on
+                print(context)
                 x = torch.tensor(context, dtype=torch.long)[None,...].to(trainer.device)
-                y = model.generate(x, 500, temperature=1.0, do_sample=True, top_k=10)[0]
-                print(y)
-                with open("output_" + str(trainer.iter_num //5000) + ".npy", "wb") as f:
-                    np.save(f, y.to("cpu").numpy())
+                y = model.generate(x, 1000, temperature=1.0, do_sample=True, top_k=10)[0]
+                converted_y = np.array([train_dataset.itos[c.item()] for c in y]) # reverting back to pitch representation
+                print(converted_y)
+                with open("out/model outputs/output_mini_" + str(trainer.iter_num //n_train_eval) + ".npy", "wb") as f:
+                    np.save(f, converted_y)
+
             # save the latest model
             print("saving model")
-            ckpt_path = os.path.join(config.system.work_dir, "model" + str(trainer.iter_num // 5000) + ".pt")
+            ckpt_path = os.path.join(config.system.work_dir, "model" + str(trainer.iter_num // n_train_eval) + ".pt")
             torch.save(model.state_dict(), ckpt_path)
             # revert model to training mode
             model.train()
