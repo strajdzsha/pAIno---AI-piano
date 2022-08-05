@@ -15,6 +15,7 @@ for fname in filenames:
     music = muspy.read_midi(path + fname, backend='pretty_midi')
     music_pitch = muspy.to_pitch_representation(music, use_hold_state=True, dtype=int)
     dataset.append(music_pitch.squeeze())
+    print(music_pitch)
     #print(music_pitch.shape)
 
 new_dataset = np.concatenate(dataset, axis=0)
