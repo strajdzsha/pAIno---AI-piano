@@ -59,6 +59,7 @@ class CharDataset(Dataset):
         # return as tensors
         x = torch.tensor(dix[:-1], dtype=torch.long)
         y = torch.tensor(dix[1:], dtype=torch.long)
+
         return x, y
 
 
@@ -68,7 +69,7 @@ def get_config():
 
     # system
     C.system = CN()
-    C.system.seed = 3407
+    #C.system.seed = 3407
     C.system.work_dir = './out/models'
 
     # data
@@ -113,19 +114,24 @@ if __name__ == '__main__':
         if trainer.iter_num % 10 == 0:
             print(f"iter_dt {trainer.iter_dt * 1000:.2f}ms; iter {trainer.iter_num}: train loss {trainer.loss.item():.5f}")
         
-        if trainer.iter_num % 1000 == 0:
+        if trainer.iter_num % 5000 == 0:
             # evaluate both the train and test score
             model.eval()
             with torch.no_grad():
                 # sample from the model...
-                context = [45, 129, 129, 15]
-                x = torch.tensor([train_dataset.stoi[s] for s in context], dtype=torch.long)[None,...].to(trainer.device)
+                rand_int = np.random.randint(0, 10)
+                contexts = [[20, 89, 89, 89], [30, 20, 40, 50], [20], [70, 89], [30, 89, 89, 89, 89, 89, 89, 89, 89, 88, 88, 88, 88, 88, 88, 88, 88, 88,
+        88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88,
+        88, 88, 88, 88, 88, 88, 88, 88, 88, 42], [54, 89, 89, 89, 89, 89, 60, 89, 89, 89, 89], [40], [50], [10], [88], [13, 13, 13, 13]]
+                context = contexts[rand_int]
+                x = torch.tensor(context, dtype=torch.long)[None,...].to(trainer.device)
                 y = model.generate(x, 500, temperature=1.0, do_sample=True, top_k=10)[0]
-                completion = ''.join([train_dataset.itos[int(i)] for i in y])
-                print(completion)
+                print(y)
+                with open("output_" + str(trainer.iter_num //5000) + ".npy", "wb") as f:
+                    np.save(f, y.to("cpu").numpy())
             # save the latest model
             print("saving model")
-            ckpt_path = os.path.join(config.system.work_dir, "model" + str(trainer.iter_num // 1000) + ".pt")
+            ckpt_path = os.path.join(config.system.work_dir, "model" + str(trainer.iter_num // 5000) + ".pt")
             torch.save(model.state_dict(), ckpt_path)
             # revert model to training mode
             model.train()
