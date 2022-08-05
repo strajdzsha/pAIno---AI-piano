@@ -2,3 +2,6 @@ out
 Dataset.txt
 minGPT
 Dataset_mini.npy
+/midi_conversion/dataset
+minGPT
+Dataset_mini_with_end_tokens.npy

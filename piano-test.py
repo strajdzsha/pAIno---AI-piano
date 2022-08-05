@@ -14,10 +14,13 @@ import os
 import tqdm.auto
 import matplotlib
 import matplotlib.pyplot as plt
+from midi_conversion.load_dataset import END_TOKEN
 
 from minGPT.mingpt.model import GPT
 from minGPT.mingpt.trainer import Trainer
 from minGPT.mingpt.utils import set_seed, setup_logging, CfgNode as CN
+
+
 
 class CharDataset(Dataset):
     """
@@ -32,6 +35,8 @@ class CharDataset(Dataset):
 
     def __init__(self, config, data):
         self.config = config
+
+        self.END_TOKEN = 420 #token that tells we encoutered end of the song
 
         chars = sorted(list(set(data)))
         data_size, vocab_size = len(data), len(chars)
@@ -52,9 +57,12 @@ class CharDataset(Dataset):
         return len(self.data) - self.config.block_size
 
     def __getitem__(self, idx):
-        print(" " + str(idx) + " ")
         # grab a chunk of (block_size + 1) characters from the data
         chunk = self.data[idx:idx + self.config.block_size + 1]
+        if self.END_TOKEN in chunk:
+            i = np.where(chunk == END_TOKEN)
+            i = i[0].squeeze()
+            chunk[i:] = 129 # 129 is hold note
         # encode every character to an integer
         dix = [self.stoi[s] for s in chunk]
         # return as tensors
@@ -98,7 +106,7 @@ if __name__ == '__main__':
     #block_size = 128
     config = get_config()
 
-    full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset_mini.npy" 
+    full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset_mini_with_end_tokens.npy" 
     dataset_arr = np.load(full_path_to_training_text_file)
     train_dataset = CharDataset(config.data, dataset_arr) 
 

@@ -4,6 +4,8 @@ import muspy
 import numpy as np
 import os
 
+END_TOKEN = 420
+
 path = 'C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\midi_conversion\\dataset\\'
 #dataset_path = path + 'maestro-v3.0.0.csv'
 #dataframe = pd.read_csv(dataset_path)
@@ -20,6 +22,7 @@ for fname in filenames:
     except:
         print("Bad file.")
     dataset.append(music_pitch.squeeze())
+    dataset.append([END_TOKEN])
 
 new_dataset = np.concatenate(dataset, axis=0)
-# np.save("Dataset_mini.npy", new_dataset)
+np.save("Dataset_mini_with_end_tokens.npy", new_dataset)
