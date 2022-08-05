@@ -2,7 +2,9 @@ import pandas as pd
 from mido import MidiFile
 import muspy
 import numpy as np
+import os
 
+'''
 music_pitch = np.array([20, 89, 30, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89,
         89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89,
         89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89,
@@ -31,6 +33,7 @@ music_pitch = np.array([20, 89, 30, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 
         88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88,
         88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88, 88,
         88, 88, 88, 88, 88, 88, 47, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89, 89])
+        '''
 
 
 def convertoToPitch(filepath):
@@ -39,7 +42,14 @@ def convertoToPitch(filepath):
     return music_pitch.squeeze()
 
 def writeMidi(music_pitch, filepath):
-    new_midi = muspy.from_pitch_representation(music_pitch+40, resolution=24, program=0, is_drum=False, use_hold_state=True, default_velocity=64)
+    new_midi = muspy.from_pitch_representation(music_pitch, resolution=24, program=0, is_drum=False, use_hold_state=True, default_velocity=100)
     new_midi_file = muspy.write_midi(filepath, new_midi, backend='pretty_midi')
 
-writeMidi(music_pitch, "testic.midi")
+idx = 0
+for file in os.listdir("out/model outputs/"):
+    music_pitch = np.load("out/model outputs/output_" + str(idx) + ".npy")
+    music_pitch += 40
+    writeMidi(music_pitch, "out/music/output_" + str(idx) + ".midi")
+    idx += 10
+    if idx > 190:
+        break

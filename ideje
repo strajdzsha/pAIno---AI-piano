@@ -1,0 +1,27 @@
+### Ideje za projekat
+
+# Dataset
+- skratiti podatke: nepotrebno pojavljivanje 88 i 89
+- proveriti da li je dobra konverzija iz numpy niza u midi (povisenje pitch-a za 40)
+- razmotriti razdvajanje pesama u samom dataset-u
+- razmisliti o pametnijem kodiranju nota (velocity, akordi...)?
+
+# Model
+- razmisliti o blok_size-u, odabrati mu pametnije vrednosti
+- cvakati parametre
+
+# Generalno
+- i dalje uciti o GPT-u
+- srediti github i generalno kod
+
+
+### Plan rada za 5.8.
+# Strahinja
+- probati druge dataset-ove
+-  skratiti podatke: nepotrebno pojavljivanje 88 i 89
+- proveriti da li je dobra konverzija iz numpy niza u midi (povisenje pitch-a za 40)
+- razmotriti razdvajanje pesama u samom dataset-u
+- razmisliti o pametnijem kodiranju nota (velocity, akordi...)?
+
+# Teodora
+-
