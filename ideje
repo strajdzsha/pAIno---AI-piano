@@ -20,12 +20,23 @@
 - probati druge dataset-ove T
 - skratiti podatke : nepotrebno pojavljivanje 88 i 89
 - proveriti da li je dobra konverzija iz numpy niza u midi (povisenje pitch-a za 40) T
-- razmotriti razdvajanje pesama u samom dataset-u
-- razmisliti o pametnijem kodiranju nota (velocity, akordi...)?
+- razmotriti razdvajanje pesama u samom dataset-u T
+- razmisliti o pametnijem kodiranju nota (velocity, akordi...)? T
 
 - https://github.com/mcleavey/musical-neural-net ?
 - MIDI konverzija u pitch radi samo bez akorda ... sta sad sa akordima?
 
 # Teodora
-- proveriti kako GPT sempluje nase podatke (batch, sampler, block_size...)
-- 
+- proveriti kako GPT sempluje nase podatke (batch, sampler, block_size...) T
+- transponovati sve pesme T
+- metrike
+- kraj pesme T
+- akordi akordi
+- hiperparametri
+
+### Plan za 6.8.
+# Strahinja
+- proveriti overfit
+- i dalje akordi
+- modul za generisanje muzike
+- bolji monophonic dataset

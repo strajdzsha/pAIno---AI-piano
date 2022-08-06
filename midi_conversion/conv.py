@@ -17,7 +17,7 @@ def writeMidi(music_pitch, filepath):
 idx = 0
 for file in os.listdir("out/model outputs/"):
     music_pitch = np.load("out/model outputs/output_mini_" + str(idx) + ".npy")
-    writeMidi(music_pitch, "out/music/delete_this_" + str(idx) + ".midi")
+    writeMidi(music_pitch, "out/music/output_mini_gpt2_" + str(idx) + ".midi")
     idx += 1
-    if idx > 7:
+    if idx > 56:
         break
