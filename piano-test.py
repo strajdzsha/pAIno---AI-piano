@@ -30,7 +30,7 @@ class CharDataset(Dataset):
     @staticmethod
     def get_default_config():
         C = CN()
-        C.block_size = 32
+        C.block_size = 96
         return C
 
     def __init__(self, config, data):
@@ -44,7 +44,7 @@ class CharDataset(Dataset):
 
         self.stoi = { ch:i for i,ch in enumerate(chars) }
         self.itos = { i:ch for i,ch in enumerate(chars) }
-        self.vocab_size = vocab_size
+        self.vocab_size = vocab_size - 1 # -1 because of end token
         self.data = data
 
     def get_vocab_size(self):
@@ -86,7 +86,7 @@ def get_config():
 
     # model
     C.model = GPT.get_default_config()
-    C.model.model_type = 'gpt-mini'
+    C.model.model_type = 'gpt2'
 
     # trainer
     C.trainer = Trainer.get_default_config()
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     model = GPT(config.model)
 
     trainer = Trainer(config.trainer, model, train_dataset)
-
+    
     def batch_end_callback(trainer):
 
         if trainer.iter_num % 10 == 0:
