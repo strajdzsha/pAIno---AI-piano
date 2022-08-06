@@ -36,7 +36,10 @@
 
 ### Plan za 6.8.
 # Strahinja
-- proveriti overfit
+- proveriti overfit _Tu i tamo_
 - i dalje akordi
-- modul za generisanje muzike
+- modul za generisanje muzike T
 - bolji monophonic dataset
+
+# AKORDI:
+- https://towardsdatascience.com/generate-piano-instrumental-music-by-using-deep-learning-80ac35cdbd2e

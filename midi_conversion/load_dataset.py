@@ -25,6 +25,7 @@ filenames = os.listdir("midi_conversion/dataset")
 
 for fname in filenames:
     music = muspy.read_midi(path + fname, backend='pretty_midi')
+    music.adjust_resolution(4)
     
     score = music21.converter.parse(path + fname)
     key = score.analyze('key')
@@ -43,4 +44,4 @@ for fname in filenames:
     dataset.append([END_TOKEN])
 
 new_dataset = np.concatenate(dataset, axis=0)
-np.save("Dataset_mini_with_end_tokens.npy", new_dataset)
+#np.save("Dataset_mini_with_end_tokens_lower_res.npy", new_dataset)

@@ -30,7 +30,7 @@ class CharDataset(Dataset):
     @staticmethod
     def get_default_config():
         C = CN()
-        C.block_size = 96
+        C.block_size = 16
         return C
 
     def __init__(self, config, data):
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     #block_size = 128
     config = get_config()
 
-    full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset_mini_with_end_tokens.npy" 
+    full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset_mini_with_end_tokens_lower_res.npy" 
     dataset_arr = np.load(full_path_to_training_text_file)
     train_dataset = CharDataset(config.data, dataset_arr) 
 
@@ -118,6 +118,8 @@ if __name__ == '__main__':
     trainer = Trainer(config.trainer, model, train_dataset)
     
     def batch_end_callback(trainer):
+
+        min_loss = 5
 
         if trainer.iter_num % 10 == 0:
             print(f"iter_dt {trainer.iter_dt * 1000:.2f}ms; iter {trainer.iter_num}: train loss {trainer.loss.item():.5f}")
@@ -131,11 +133,11 @@ if __name__ == '__main__':
 
                 context = [48, 129, 129, 129] # pitch representation of prompt
                 context = [train_dataset.stoi[x] for x in context] # going form pitch representation to something model would train on
-                print(context)
+                # print(context)
                 x = torch.tensor(context, dtype=torch.long)[None,...].to(trainer.device)
                 y = model.generate(x, 1000, temperature=1.0, do_sample=True, top_k=10)[0]
                 converted_y = np.array([train_dataset.itos[c.item()] for c in y]) # reverting back to pitch representation
-                print(converted_y)
+                # print(converted_y)
                 with open("out/model outputs/output_mini_" + str(trainer.iter_num //n_train_eval) + ".npy", "wb") as f:
                     np.save(f, converted_y)
 
@@ -143,6 +145,13 @@ if __name__ == '__main__':
             print("saving model")
             ckpt_path = os.path.join(config.system.work_dir, "model" + str(trainer.iter_num // n_train_eval) + ".pt")
             torch.save(model.state_dict(), ckpt_path)
+
+            if trainer.loss.item() < min_loss:
+                ckpt_path = os.path.join(config.system.work_dir, "model_best.pt")
+                torch.save(model.state_dict(), ckpt_path)
+
+                min_loss = trainer.loss.item()
+        
             # revert model to training mode
             model.train()
 

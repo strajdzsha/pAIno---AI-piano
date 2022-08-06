@@ -10,14 +10,14 @@ def convertToPitch(filepath):
     music_pitch = muspy.to_pitch_representation(music, use_hold_state=True, dtype=int)
     return music_pitch.squeeze()
 
-def writeMidi(music_pitch, filepath):
-    new_midi = muspy.from_pitch_representation(music_pitch, resolution=24, program=0, is_drum=False, use_hold_state=True, default_velocity=100)
+def writeMidi(music_pitch, filepath, resolution=24):
+    new_midi = muspy.from_pitch_representation(music_pitch, resolution=resolution, program=0, is_drum=False, use_hold_state=True, default_velocity=100)
     new_midi_file = muspy.write_midi(filepath, new_midi, backend='pretty_midi')
 
 idx = 0
 for file in os.listdir("out/model outputs/"):
     music_pitch = np.load("out/model outputs/output_mini_" + str(idx) + ".npy")
-    writeMidi(music_pitch, "out/music/output_mini_gpt2_" + str(idx) + ".midi")
+    writeMidi(music_pitch, "out/music/output_mini_gpt2_" + str(idx) + ".midi", 4)
     idx += 1
-    if idx > 56:
+    if idx > 11:
         break
