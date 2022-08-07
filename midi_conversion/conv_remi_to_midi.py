@@ -19,11 +19,13 @@ additional_tokens = {'Chord': True, 'Rest': True, 'Tempo': True, 'Program': Fals
                      'tempo_range': (40, 250)}  # (min, max)
 tokenizer = REMI(pitch_range, beat_res, nb_velocities, additional_tokens, mask=True)
 
+root_dataset = "D:\\PSIML\\datasets\\"
+midi = MidiFile(root_dataset + "maestro-v3.0.0\\2004\MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_05_Track05_wav.midi")
 
-midi = MidiFile("maestro-v3.0.0\\2004\MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_05_Track05_wav.midi")
+root = "D:\\PSIML\\code\\pAIno---AI-piano\\Evaluation\\generated_samples\\"
+for filename in os.listdir(root):
 
-for i in range(47):
-    piano_tokens = np.load("out\\model outputs\\output_mini_" + str(i) + ".npy").tolist()
+    piano_tokens = np.load(root + filename).tolist()
 
     converted_back_midi = tokenizer.tokens_to_midi([piano_tokens], get_midi_programs(midi))
-    converted_back_midi.dump('out\\music\\MAESTRO\\output_gpt2_' + str(i) + '.midi')
+    converted_back_midi.dump(root + filename + '.midi')
