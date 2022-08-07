@@ -10,7 +10,7 @@ def convertToPitch(filepath):
     music_pitch = muspy.to_pitch_representation(music, use_hold_state=True, dtype=int)
     return music_pitch.squeeze()
 
-def writeMidi(music_pitch, filepath, resolution=24):
+def writeMidi(music_pitch, filepath, resolution=4):
     new_midi = muspy.from_pitch_representation(music_pitch, resolution=resolution, program=0, is_drum=False, use_hold_state=True, default_velocity=100)
     new_midi_file = muspy.write_midi(filepath, new_midi, backend='pretty_midi')
 

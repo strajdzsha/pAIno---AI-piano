@@ -6,3 +6,6 @@ Dataset_mini.npy
 minGPT
 Dataset_mini_with_end_tokens.npy
 minGPT
+Dataset_maestro_with_chords.npy
+Dataset_mini_with_end_tokens_lower_res.npy
+maestro-v3.0.0/
