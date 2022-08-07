@@ -161,5 +161,5 @@ if __name__ == '__main__':
             model.train()
 
     trainer.set_callback('on_batch_end', batch_end_callback)
-    wandb.init(entity='strajdzsha', project = 'lgpt3q+')
+    wandb.init(entity='strajdzsha', project = 'lgpt3q')
     trainer.run()
