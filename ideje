@@ -37,9 +37,9 @@
 ### Plan za 6.8.
 # Strahinja
 - proveriti overfit _Tu i tamo_
-- i dalje akordi
+- i dalje akordi T
 - modul za generisanje muzike T
-- bolji monophonic dataset
+- bolji monophonic dataset T
 
 # AKORDI:
 - https://towardsdatascience.com/generate-piano-instrumental-music-by-using-deep-learning-80ac35cdbd2e - previse bolesno i komplikovano
@@ -47,3 +47,15 @@
 - slikovita reprezentacija slika
 - MIDITOK https://github.com/Natooz/MidiTok - T RADIIII!!!!
 - https://arxiv.org/pdf/2002.00212.pdf - rad koji predlaze REMI
+
+
+### Plan 7.8.
+
+# Strahinja
+- pustati model za razlicite hiperparametre i cuvati loss 
+- proveriti overfit
+- metrike za evaluaciju
+- transponovanje?
+
+
+# Teodora

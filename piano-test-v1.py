@@ -14,12 +14,13 @@ import os
 import tqdm.auto
 import matplotlib
 import matplotlib.pyplot as plt
-from midi_conversion.load_dataset import END_TOKEN
+# from midi_conversion.load_dataset import END_TOKEN
+END_TOKEN = 420
 
 from minGPT.mingpt.model import GPT
 from minGPT.mingpt.trainer import Trainer
 from minGPT.mingpt.utils import set_seed, setup_logging, CfgNode as CN
-
+import wandb
 
 
 class CharDataset(Dataset):
@@ -123,6 +124,10 @@ if __name__ == '__main__':
 
         if trainer.iter_num % 10 == 0:
             print(f"iter_dt {trainer.iter_dt * 1000:.2f}ms; iter {trainer.iter_num}: train loss {trainer.loss.item():.5f}")
+        if trainer.iter_num % 100 == 0:
+            wandb.log({
+                "Loss":trainer.loss.item()
+            })
         
         n_train_eval = 2000
         if trainer.iter_num % n_train_eval == 0 :
@@ -156,5 +161,5 @@ if __name__ == '__main__':
             model.train()
 
     trainer.set_callback('on_batch_end', batch_end_callback)
-
+    wandb.init(entity='strajdzsha', project = 'lgpt3q+')
     trainer.run()
