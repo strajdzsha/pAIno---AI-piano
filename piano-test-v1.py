@@ -5,6 +5,7 @@ import torch.nn as nn
 from torch import optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset
+from matplotlib import pyplot as plt
 
 import time
 import math
@@ -20,7 +21,6 @@ END_TOKEN = 420
 from minGPT.mingpt.model import GPT
 from minGPT.mingpt.trainer import Trainer
 from minGPT.mingpt.utils import set_seed, setup_logging, CfgNode as CN
-import wandb
 
 
 class CharDataset(Dataset):
@@ -63,7 +63,7 @@ class CharDataset(Dataset):
         if self.END_TOKEN in chunk:
             i = np.where(chunk == END_TOKEN)
             i = i[0].squeeze()
-            chunk[i:] = chunk[i-2] # CHANGE THIS PLS !!!!!!!!!!!!!!!!!!!
+            chunk[i:] = chunk[i-2] # adding last integer that is not END_TOKEN; this was done to prevent chunk from containing song transition
         # encode every character to an integer
         dix = [self.stoi[s] for s in chunk]
         # return as tensors
@@ -124,10 +124,13 @@ if __name__ == '__main__':
 
         if trainer.iter_num % 10 == 0:
             print(f"iter_dt {trainer.iter_dt * 1000:.2f}ms; iter {trainer.iter_num}: train loss {trainer.loss.item():.5f}")
-        if trainer.iter_num % 100 == 0:
-            wandb.log({
-                "Loss":trainer.loss.item()
-            })
+
+        if trainer.iter_num % 100 == 0 and trainer.iter_num > 1:
+            losses.append(trainer.loss.item())
+            with open("out/losses.npy", "wb") as f:
+                np.save(f, np.array(losses))
+            plt.plot(np.array(losses))
+            plt.savefig("out/losses.jpg")
         
         n_train_eval = 2000
         if trainer.iter_num % n_train_eval == 0 :
@@ -160,6 +163,6 @@ if __name__ == '__main__':
             # revert model to training mode
             model.train()
 
+    losses = []
     trainer.set_callback('on_batch_end', batch_end_callback)
-    wandb.init(entity='strajdzsha', project = 'lgpt3q')
     trainer.run()
