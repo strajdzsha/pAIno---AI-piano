@@ -42,7 +42,7 @@ numpy v1.23.1 <br/>
 
 # TODO
 
-- A lot of work needs to be done on piano_testv1.py
+- A lot of work needs to be done on piano-test-v1.py
 - Clean up code for generate_music.py, unnecessary loading of dataset slowes down generating music.
 - Train model on different, simpler, datasets
 - Upgrade model so it can proccess multi instrument tracks
