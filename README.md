@@ -18,13 +18,31 @@ with torch.no_grad():
     converted_y = np.array([train_dataset.itos[c.item()] for c in y]) # reverting back to remi representation
 ```
 You can specify your own context in any way you want, and set the parameters for temperature, max_tokens and top_k.
-If something doesn't work, you may want to check requirements for library versions.
+If something doesn't work, you may want to check [requirements](https://github.com/strajdzsha/pAIno---AI-piano/edit/main/README.md#requirements) for library versions.
 
 # Dataset preparation
+We used [MAESTRO](https://magenta.tensorflow.org/datasets/maestro) dataset which contains ~1k midi files, each of length 3-5min.
+For preprocessing we used [Natooz's](https://github.com/Natooz) library miditok, whose documentation can be found [here](https://github.com/Natooz/MidiTok). We used REMI representation of notes, which converts midi file to 1D numpy array that can be directly fed into model. <br/>
 
+<p align="center">
+  <img src="https://github.com/strajdzsha/pAIno---AI-piano/blob/main/src/remi.png" />
+</p>
 
 # Model
+For the model we used [karpathy's](https://github.com/karpathy) excellent gpt2 implementation called [minGPT](https://github.com/karpathy/minGPT). It is easy to implement and even to understand the code for the model.<br/>
+We got best results for model gpt2 (117M parameters), block_size = 512 and learning_rate = 1e4, which was trained for 50k iterations. You can find it on before mentioned [location](https://drive.google.com/drive/folders/13S-rnXaWo_n5oGZHm8_U4Z8Y7B233R20?usp=sharing). 
 
 # Requirements
+Library versions we installed:
+
+miditok v1.2.7<br/>
+mingpt v0.0.1 <br/>
+torch v1.12.0 <br/>
+numpy v1.23.1 <br/>
 
 # TODO
+
+- A lot of work needs to be done on piano_testv1.py
+- Clean up code for generate_music.py, unnecessary loading of dataset slowes down generating music.
+- Train model on different, simpler, datasets
+- Upgrade model so it can proccess multi instrument tracks
