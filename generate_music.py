@@ -1,29 +1,19 @@
 import numpy as np
-import torchvision
 import torch
-import torch.nn as nn
-from torch import optim
-import torch.nn.functional as F
 from torch.utils.data import Dataset
 
-import time
-import math
 import os
-
-import muspy
-
-import tqdm.auto
-import matplotlib
-import matplotlib.pyplot as plt
 
 from minGPT.mingpt.model import GPT
 from minGPT.mingpt.trainer import Trainer
-from minGPT.mingpt.utils import set_seed, setup_logging, CfgNode as CN
+from minGPT.mingpt.utils import CfgNode as CN
 
 from miditok import REMI, get_midi_programs
 from miditoolkit import MidiFile
 
 END_TOKEN = 420
+
+''' Load pretrained model to generate music. This module is very similar to piano-test.py except the training part.'''
 
 pitch_range = range(21, 109)
 beat_res = {(0, 4): 8, (4, 12): 4}
@@ -34,8 +24,10 @@ additional_tokens = {'Chord': True, 'Rest': True, 'Tempo': True, 'Program': Fals
                      'tempo_range': (40, 250)}  # (min, max)
 
 tokenizer = REMI(pitch_range, beat_res, nb_velocities, additional_tokens, mask=True)
-root_dataset = "D:\\PSIML\\datasets\\"
-midi = MidiFile(root_dataset + "maestro-v3.0.0\\2004\MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_05_Track05_wav.midi")
+root_dataset = "datasets\\"
+midi = MidiFile(root_dataset + "maestro-v3.0.0\\2004\MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_05_Track05_wav.midi") # really ugly; all it does is it loads 
+                                                                                                                                            # random song from dataset, so we can use 
+                                                                                                                                            # it's parameters later on in conversion
 
 
 def get_config():
@@ -80,7 +72,6 @@ class CharDataset(Dataset):
 
         chars = sorted(list(set(data)))
         data_size, vocab_size = len(data), len(chars)
-        # print('data has %d characters, %d unique.' % (data_size, vocab_size))
 
         self.stoi = { ch:i for i,ch in enumerate(chars) }
         self.itos = { i:ch for i,ch in enumerate(chars) }
@@ -102,7 +93,7 @@ class CharDataset(Dataset):
         if self.END_TOKEN in chunk:
             i = np.where(chunk == END_TOKEN)
             i = i[0].squeeze()
-            chunk[i:] = chunk[i-2] # 129 is hold note
+            chunk[i:] = chunk[i-2]
         # encode every character to an integer
         dix = [self.stoi[s] for s in chunk]
         # return as tensors
@@ -117,8 +108,9 @@ def writeMidi(piano_tokens, filepath):
     converted_back_midi.dump(filepath + '.midi')
 
 
-def loadRandomSong():
-    path = "D:\\PSIML\\datasets\\maestro-v3.0.0\\2004\\"
+def loadRandomSong(path, length):
+    # If you want a model to continue some random song specify the path and length of sequence to be fed into model.
+    # Note: it is assumed that "path" is path to a folder with multiple songs; this function selects one at random
     filenames = os.listdir(path)
     randint = np.random.randint(0, len(filenames))
 
@@ -129,7 +121,7 @@ def loadRandomSong():
     tokenizer.current_midi_metadata = {'time_division': midi.ticks_per_beat, 'tempo_changes': midi.tempo_changes}
     piano_tokens = tokenizer.track_to_tokens(midi.instruments[0])
 
-    return piano_tokens[:150]
+    return piano_tokens[:length]
 
 
 
@@ -137,7 +129,7 @@ config = get_config()
 config.data.block_size = 512
 config.trainer.learning_rate = 0.001
 
-full_path_to_training_text_file = "C:\\Users\\psiml8\\VS projects\\pAIno---AI-piano\\Dataset_maestro_with_chords.npy" 
+full_path_to_training_text_file = "dataset.npy" 
 dataset_arr = np.load(full_path_to_training_text_file)
 train_dataset = CharDataset(config.data, dataset_arr) 
 
@@ -146,7 +138,7 @@ config.model.vocab_size = train_dataset.get_vocab_size()
 config.model.block_size = train_dataset.get_block_size()
 model = GPT(config.model)
 
-model.load_state_dict(torch.load("pAIno---AI-piano\model_0.001_512_best.pt"))
+model.load_state_dict(torch.load("model_pretrained.pt"))
 
 trainer = Trainer(config.trainer, model, train_dataset)
 
@@ -154,12 +146,10 @@ model.eval()
 n = 0
 
 with torch.no_grad():
-    context = loadRandomSong().squeeze().tolist() # pitch representation of prompt
-    context = [train_dataset.stoi[x] for x in context] # going form pitch representation to something model would train on
+    context = loadRandomSong(path="maestro-v3.0.0\\2004\\", length=150).squeeze().tolist() # remi representation of prompt
+    context = [train_dataset.stoi[x] for x in context] # going form remi representation to something model would train on
     x = torch.tensor(context, dtype=torch.long)[None,...].to(trainer.device)
     y = model.generate(x, 1000, temperature=1.0, do_sample=True, top_k=10)[0]
-    converted_y = np.array([train_dataset.itos[c.item()] for c in y]) # reverting back to pitch representation
+    converted_y = np.array([train_dataset.itos[c.item()] for c in y]) # reverting back to remi representation
 
-
-# music_pitch = np.load("out/model outputs/generated_" + str(n) + ".npy")
 writeMidi(converted_y, "generated.midi")

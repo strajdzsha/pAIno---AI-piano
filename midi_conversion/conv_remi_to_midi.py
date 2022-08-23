@@ -19,10 +19,10 @@ additional_tokens = {'Chord': True, 'Rest': True, 'Tempo': True, 'Program': Fals
                      'tempo_range': (40, 250)}  # (min, max)
 tokenizer = REMI(pitch_range, beat_res, nb_velocities, additional_tokens, mask=True)
 
-root_dataset = "D:\\PSIML\\datasets\\"
+root_dataset = "datasets\\"
 midi = MidiFile(root_dataset + "maestro-v3.0.0\\2004\MIDI-Unprocessed_SMF_22_R1_2004_01-04_ORIG_MID--AUDIO_22_R1_2004_05_Track05_wav.midi")
 
-root = "D:\\PSIML\\code\\pAIno---AI-piano\\Evaluation\\generated_samples\\"
+root = "evaluation\\generated_samples\\"
 for filename in os.listdir(root):
 
     piano_tokens = np.load(root + filename).tolist()
